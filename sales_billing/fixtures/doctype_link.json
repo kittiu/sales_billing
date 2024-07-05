@@ -1,0 +1,19 @@
+[
+ {
+  "custom": 1,
+  "docstatus": 0,
+  "doctype": "DocType Link",
+  "group": "Reference",
+  "hidden": 0,
+  "is_child_table": 0,
+  "link_doctype": "Sales Billing",
+  "link_fieldname": "sales_invoice",
+  "modified": "2023-01-09 15:49:06.045546",
+  "name": "3114c99961",
+  "parent": "Sales Invoice",
+  "parent_doctype": null,
+  "parentfield": "links",
+  "parenttype": "Customize Form",
+  "table_fieldname": null
+ }
+]
