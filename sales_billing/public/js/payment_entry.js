@@ -87,7 +87,7 @@ frappe.ui.form.on("Payment Entry", {
                     }
                 }
 
-                frm.events.allocate_party_amount_against_ref_docs(frm, frm.doc.paid_amount);
+                frm.events.allocate_party_amount_against_ref_docs(frm, frm.doc.paid_amount, true);
 
             })
         })
