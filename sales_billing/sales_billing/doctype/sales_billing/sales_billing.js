@@ -56,3 +56,136 @@ frappe.ui.form.on("Sales Billing Line", {
     }
 
 })
+
+frappe.ui.form.on('Sales Billing', {
+    refresh: function (frm) {
+        if (frm.doc.docstatus === 1) {
+            frm.add_custom_button(__('Create Multi-Payments'), function () {
+                let fields = [
+                    {
+                        label: 'Total Outstanding Amount',
+                        fieldname: 'total_outstanding',
+                        fieldtype: 'Currency',
+                        default: frm.doc.total_outstanding_amount || 0,
+                        read_only: 1
+                    },
+                    { fieldtype: 'Column Break' },
+                    {
+                        label: 'Posting Date',
+                        fieldname: 'posting_date',
+                        fieldtype: 'Date',
+                        default: frappe.datetime.nowdate(),
+                        reqd: 1
+                    },
+                    {
+                        fieldtype: 'Section Break',
+                        label: 'Payment Details'
+                    },
+                    {
+                        fieldtype: 'Table',
+                        fieldname: 'payment_details',
+                        label: 'Payment Details',
+                        fields: [
+                            {
+                                label: 'Mode of Payment',
+                                fieldname: 'mode_of_payment',
+                                fieldtype: 'Link',
+                                options: 'Mode of Payment',
+                                in_list_view: 1,
+                                reqd: 1
+                            },
+                            {
+                                label: 'Party Bank Account',
+                                fieldname: 'party_bank_account',
+                                fieldtype: 'Link',
+                                options: 'Bank Account',
+                                in_list_view: 1
+                            },
+                            {
+                                label: 'Company Bank Account',
+                                fieldname: 'company_bank_account',
+                                fieldtype: 'Link',
+                                options: 'Bank Account',
+                                in_list_view: 1
+                            },
+                            {
+                                label: 'Cheque/Reference No',
+                                fieldname: 'chequereference_no',
+                                fieldtype: 'Data',
+                                in_list_view: 1
+                            },
+                            {
+                                label: 'Cheque/Reference Date',
+                                fieldname: 'chequereference_date',
+                                fieldtype: 'Date',
+                                in_list_view: 1
+                            },
+                            {
+                                label: 'Paid Amount',
+                                fieldname: 'paid_amount',
+                                fieldtype: 'Currency',
+                                in_list_view: 1,
+                                reqd: 1,
+                                change: function (e, field) {
+                                    let total_paid_amount = 0;
+                                    field.grid.get_data().forEach((row) => {
+                                        total_paid_amount += row.paid_amount || 0;
+                                    });
+
+                                    // คำนวณยอดคงค้างที่เหลือ
+                                    let remaining_outstanding = frm.doc.total_outstanding_amount - total_paid_amount;
+
+                                    // อัปเดต total_outstanding ใน Dialog
+                                    d.fields_dict.total_outstanding.set_value(remaining_outstanding);
+                                }
+                            }
+                        ],
+                        data: [],
+                        get_data: () => {
+                            return [];
+                        }
+                    }
+                ];
+                fields.push(
+                    { fieldtype: "Section Break" },
+                    {
+                        fieldtype: "Check",
+                        label: __("Allocate Payment Amount"),
+                        fieldname: "allocate_payment_amount",
+                        default: 1,
+                    }
+                );
+
+                let d = new frappe.ui.Dialog({
+                    title: __('Create Multi-Payments'),
+                    fields: fields,
+                    primary_action_label: __('Create Multi-Payments'),
+                    primary_action: function (values) {
+                        let total_paid_amount = values.payment_details.reduce((acc, row) => acc + (row.paid_amount || 0), 0);
+                        if (total_paid_amount > values.total_outstanding) {
+                            frappe.msgprint(__('Total Paid Amount cannot be greater than Total Outstanding Amount.'));
+                            return;
+                        }
+
+                        frappe.call({
+                            method: "sales_billing.sales_billing.doctype.sales_billing.sales_billing.create_payment_entry_line",
+                            args: {
+                                payment_details: values.payment_details,
+                                sales_billing_name: frm.doc.name,
+                                posting_date: values.posting_date
+                            },
+                            callback: function (r) {
+                                if (!r.exc) {
+                                    frappe.msgprint(__('Payment Receipt created: {0}', [r.message]));
+                                    d.hide();
+                                }
+                            }
+                        });
+                    }
+                });
+
+                d.show();
+            }).addClass('btn-primary');
+        }
+    }
+});
