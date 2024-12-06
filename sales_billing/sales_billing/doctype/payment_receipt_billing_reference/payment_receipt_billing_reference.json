@@ -76,7 +76,7 @@
  "modified": "2024-12-03 02:34:26.874316",
  "modified_by": "Administrator",
  "module": "Sales Billing",
- "name": "Payment References",
+ "name": "Payment Receipt Billing Reference",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

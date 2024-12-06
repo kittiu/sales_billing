@@ -10,6 +10,7 @@ def get_data():
         },
         "internal_and_external_links": {
 			"Sales Invoice": ["sales_billing_line", "sales_invoice"],
+            "Payment Entry": ["sales_billing_line", "sales_billing"],
 		},
         "transactions": [
             {"label": _("Reference"), "items": ["Sales Invoice"]},  

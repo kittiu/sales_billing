@@ -79,7 +79,6 @@ frappe.ui.form.on('Sales Billing', {
                     },
                     {
                         fieldtype: 'Section Break',
-                        label: 'Payment Details'
                     },
                     {
                         fieldtype: 'Table',
@@ -99,14 +98,12 @@ frappe.ui.form.on('Sales Billing', {
                                 fieldname: 'party_bank_account',
                                 fieldtype: 'Link',
                                 options: 'Bank Account',
-                                in_list_view: 1
                             },
                             {
                                 label: 'Company Bank Account',
                                 fieldname: 'company_bank_account',
                                 fieldtype: 'Link',
                                 options: 'Bank Account',
-                                in_list_view: 1
                             },
                             {
                                 label: 'Cheque/Reference No',
@@ -132,18 +129,12 @@ frappe.ui.form.on('Sales Billing', {
                                         total_paid_amount += row.paid_amount || 0;
                                     });
 
-                                    // คำนวณยอดคงค้างที่เหลือ
                                     let remaining_outstanding = frm.doc.total_outstanding_amount - total_paid_amount;
 
-                                    // อัปเดต total_outstanding ใน Dialog
                                     d.fields_dict.total_outstanding.set_value(remaining_outstanding);
                                 }
                             }
                         ],
-                        data: [],
-                        get_data: () => {
-                            return [];
-                        }
                     }
                 ];
                 fields.push(
@@ -161,23 +152,35 @@ frappe.ui.form.on('Sales Billing', {
                     fields: fields,
                     primary_action_label: __('Create Multi-Payments'),
                     primary_action: function (values) {
+                        frappe.flags.allocate_payment_amount = values.allocate_payment_amount;
+
                         let total_paid_amount = values.payment_details.reduce((acc, row) => acc + (row.paid_amount || 0), 0);
                         if (total_paid_amount > values.total_outstanding) {
                             frappe.msgprint(__('Total Paid Amount cannot be greater than Total Outstanding Amount.'));
-                            return;
+                            return; 
                         }
-
                         frappe.call({
-                            method: "sales_billing.sales_billing.doctype.sales_billing.sales_billing.create_payment_entry_line",
+                            method: "sales_billing.sales_billing.doctype.sales_billing.sales_billing.create_payment_receipt",
                             args: {
                                 payment_details: values.payment_details,
                                 sales_billing_name: frm.doc.name,
                                 posting_date: values.posting_date
                             },
                             callback: function (r) {
-                                if (!r.exc) {
-                                    frappe.msgprint(__('Payment Receipt created: {0}', [r.message]));
-                                    d.hide();
+                                console.log(r); 
+                            
+                                if (!r.exc && r.message) {
+                                    let receipt_names = r.message.payment_receipt_names;
+                            
+                                    if (receipt_names && receipt_names.length > 0) {
+                                        let links = receipt_names.map(name => {
+                                            return `<a href="/app/payment-receipt/${name}" target="_blank">${name}</a>`;
+                                        });
+                                        frappe.msgprint(__('Payment Receipts Created: {0}', [links.join(", ")]));
+                                    } else {
+                                        frappe.msgprint(__('Payment Receipts created successfully, but the names could not be retrieved.'));
+                                    }
+                                    d.hide(); 
                                 }
                             }
                         });
@@ -189,3 +192,4 @@ frappe.ui.form.on('Sales Billing', {
         }
     }
 });
+

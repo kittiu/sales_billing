@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class PaymentReferences(Document):
+class PaymentReceiptBillingReference(Document):
 	pass

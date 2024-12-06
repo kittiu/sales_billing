@@ -12,9 +12,9 @@
   "company",
   "date",
   "section_break_gvcn",
-  "payment_entry_line",
-  "section_break_fmgx",
   "payment_references",
+  "section_break_fmgx",
+  "billing_references",
   "section_break_fhdg",
   "amended_from"
  ],
@@ -58,20 +58,14 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "payment_entry_line",
-   "fieldtype": "Table",
-   "label": "Payment Entry",
-   "options": "Payment Entry Line"
-  },
-  {
    "fieldname": "section_break_fmgx",
    "fieldtype": "Section Break"
   },
   {
    "fieldname": "payment_references",
    "fieldtype": "Table",
-   "label": "Payment References",
-   "options": "Payment References"
+   "label": "Payment Entry",
+   "options": "Payment Receipt Payment Reference"
   },
   {
    "fieldname": "section_break_fhdg",
@@ -86,12 +80,18 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "billing_references",
+   "fieldtype": "Table",
+   "label": "Payment References",
+   "options": "Payment Receipt Billing Reference"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-03 02:34:13.379675",
+ "modified": "2024-12-04 21:07:05.659982",
  "modified_by": "Administrator",
  "module": "Sales Billing",
  "name": "Payment Receipt",
