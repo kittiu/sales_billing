@@ -146,7 +146,6 @@ frappe.ui.form.on('Sales Billing', {
                         default: 1,
                     }
                 );
-
                 let d = new frappe.ui.Dialog({
                     title: __('Create Multi-Payments'),
                     fields: fields,
@@ -167,8 +166,6 @@ frappe.ui.form.on('Sales Billing', {
                                 posting_date: values.posting_date
                             },
                             callback: function (r) {
-                                console.log(r); 
-                            
                                 if (!r.exc && r.message) {
                                     let receipt_names = r.message.payment_receipt_names;
                             
@@ -192,4 +189,3 @@ frappe.ui.form.on('Sales Billing', {
         }
     }
 });
-
